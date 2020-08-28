@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { themeContext } from '../common/AppConfig'
 import { declareWinner } from './win'
 import Board from './board';
 import Player from './player';
 import Timer from './timer';
+import { ThemeContext } from '../context/ThemeContext'
 
 const Index = () => {
     // borad
@@ -20,6 +22,12 @@ const Index = () => {
     const [count, setCount] = useState(1);
     let winner = declareWinner(squares)
 
+    // Context
+    const { isLightTheme, light, dark } = useContext(ThemeContext);
+    const theme = isLightTheme ? light : dark;
+
+    const { toggleTheme } = useContext(ThemeContext);
+
     // On start game click
     const handleStart = () => {
         if (window.confirm("Every player will have 5 second for single chance. If you will fail to play within 5 second opponent player will win. Let's start ? ")) {
@@ -32,11 +40,14 @@ const Index = () => {
         if (startGame && !gameOver && winner === null) {
             if (count === 6) {
                 console.log(isPlayed)
+
+                // If user didn't play withing 5 second game is over.
                 if (isPlayed === false) {
                     setGameOver(true)
                     const winner = nextPlayer === 'X' ? player2 : player1
                     alert(`You didn't play within 5 second. Player ${winner} win.`)
                 }
+
                 //  Give chance to second player
                 setCount(0)
                 setIsPlayed(false)
@@ -50,10 +61,11 @@ const Index = () => {
         }
     }, [startGame, count, isPlayed]);
 
+    // Fill square
     const handleClick = (index) => {
         const spreadSquares = [...squares]
         if (spreadSquares[index] === null && winner === null && isPlayed === false && gameOver === false) {
-            // update one move
+            // update move
             spreadSquares[index] = nextPlayer
             setSquares(spreadSquares)
             setCountMove(count => count + 1)
@@ -68,6 +80,7 @@ const Index = () => {
         }
     }, [countMove])
 
+    // Reset game
     useEffect(() => {
         if (gameOver) {
             if (window.confirm("Hey! wanna start again?")) {
@@ -77,7 +90,7 @@ const Index = () => {
     }, [gameOver])
 
     return (
-        <div className="wrapper">
+        <div className="wrapper" style={{ background: theme.bg, color: theme.textColor }}>
             <Player
                 nextPlayer={nextPlayer}
                 setPlayer1={setPlayer1}
@@ -98,6 +111,13 @@ const Index = () => {
                 </>
             )
             }
+            <button
+                onClick={toggleTheme}
+                style={theme.bg === themeContext.lightBg ?
+                    { backgroundColor: themeContext.darkBg, color: themeContext.darkTextColor } :
+                    { backgroundColor: themeContext.lightBg, color: themeContext.lightTextColor }}>
+                {theme.ui === themeContext.lightUi ? "Dark Mode" : "Light Mode"}
+            </button>
         </div>);
 }
 

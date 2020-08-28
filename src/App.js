@@ -1,11 +1,14 @@
 import React from 'react';
 import Index from './components';
+import ThemeContextProvider from './context/ThemeContext';
 
 function App() {
   return (
-    <div className="App">
-      <Index />
-    </div>
+    <ThemeContextProvider>
+      <div className="App">
+        <Index />
+      </div>
+    </ThemeContextProvider>
   );
 }
 
